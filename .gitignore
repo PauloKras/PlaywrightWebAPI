@@ -1,6 +1,7 @@
 
 # Playwright
 .env
+.env.*
 *.exe
 *.crdownload
 node_modules/
