@@ -25,21 +25,4 @@ export default defineConfig({
       },
     },
   ],
-
-
-/*
-  use: {
-    //baseURL: process.env.BASE_URL ?? 'https://practice.expandtesting.com',
-    baseURL: process.env.BASE_URL,
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
-    trace: 'on-first-retry',
-  },
-
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],*/
 });
