@@ -17,11 +17,11 @@ jobs:
         run: npx playwright install --with-deps
       - name: Run Playwright tests
         env:
-          API_URL: ${{ secrets.API_URL }}
-          USER_TOKEN: ${{ secrets.USER_TOKEN }}
-          NOTES_NAME: ${{ secrets.NOTES_NAME }}
-          BASE_URL: ${{ secrets.BASE_URL }}
           BASE_URL_API: ${{ secrets.BASE_URL_API }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          NOTES_EMAIL: ${{ secrets.NOTES_EMAIL }}
+          NOTES_PASSWORD: ${{ secrets.NOTES_PASSWORD }}
+          NOTES_NAME: ${{ secrets.NOTES_NAME }}
         run: npx playwright test
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v4
