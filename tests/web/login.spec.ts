@@ -12,7 +12,7 @@ test.describe('Login - Notes App', () => {
   let loginPage: LoginPage;
 
   test.beforeEach(async ({ page }) => {
-    // Bloqueia anúncios e trackers (Google Ads, analytics, etc.) usando expressão regular
+    // Bloqueia anúncios e trackers (Google Ads, analytics, etc.) usando expressão regular TESTE
     await page.route(/(googleads|googlesyndication|doubleclick|google-analytics|adservice)/, route => route.abort());
 
     loginPage = new LoginPage(page);
