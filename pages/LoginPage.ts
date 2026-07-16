@@ -8,7 +8,10 @@ export class LoginPage {
   readonly passwordInput: Locator;
   readonly submitButton: Locator;
   readonly errorAlert: Locator;
-  readonly pageTitle: Locator;
+  /**
+   * Localizador para o título da página de login (h1, h2, etc.) que contém o texto "Login".
+   */
+  private readonly pageTitle: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -27,6 +30,10 @@ export class LoginPage {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
     await this.submitButton.click();
+  }
+
+  async pause() {
+    await this.page.pause();
   }
 
   async expectSuccessRedirect() {
