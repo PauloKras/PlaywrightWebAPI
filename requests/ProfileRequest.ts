@@ -14,4 +14,30 @@ async getUserProfile(token: string) {
         },
     });
 }
+
+  async updateUserProfile(token: string, profileData: any) {
+    return await this.request.put(`${process.env.BASE_URL_API}/users/profile`, {
+      headers: {
+        'x-auth-token': token,
+      },
+      data: profileData,
+    });
+  }
+
+  async patchUserProfile(token: string, partialProfileData: any) {
+    return await this.request.patch(`${process.env.BASE_URL_API}/users/profile`, {
+      headers: {
+        'x-auth-token': token,
+      },
+      data: partialProfileData,
+    });
+  }
+
+  async deleteUserProfile(token: string) {
+    return await this.request.delete(`${process.env.BASE_URL_API}/users/delete-account`, {
+      headers: {
+        'x-auth-token': token,
+      },
+    });
+  }
 }

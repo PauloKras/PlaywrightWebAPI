@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { AuthRequest } from '../../../requests/AuthRequest';
+import { AuthRequest, LoginPayload } from '../../../requests/AuthRequest';
 import { NotesRequest } from '../../../requests/NotesRequest';
+//import { validLoginPayload } from '../../payloads/login/validLoginPayload';
 
 test.describe('API de Notas', () => {
   let auth: AuthRequest;
@@ -10,10 +11,11 @@ test.describe('API de Notas', () => {
 
   test.beforeAll(async ({ request }) => {
     auth = new AuthRequest(request);
-    const loginResponse = await auth.login(
-      process.env.NOTES_EMAIL!,
-      process.env.NOTES_PASSWORD!,
-    );
+    const loginPayload: LoginPayload = {
+      email: process.env.NOTES_EMAIL!,
+      password: process.env.NOTES_PASSWORD!,
+    };
+    const loginResponse = await auth.login(loginPayload);
     expect(loginResponse.status()).toBe(200);
     const body = await loginResponse.json();
     authToken = body.data.token;
@@ -87,12 +89,12 @@ if (!createdNoteId) {
 }
 
     const updatedTitle = 'Título Atualizado';
-const updatedDescription = 'Descrição Atualizada da Nota';
-const updatedCategory = 'Home';
-const updatedCompleted = false; 
-const response = await notes.updateNote(authToken, createdNoteId, updatedTitle, updatedDescription, updatedCategory, updatedCompleted);
-const errorBody = await response.json();
-expect(response.status()).toBe(200);
+    const updatedDescription = 'Descrição Atualizada da Nota';
+    const updatedCategory = 'Home';
+    const updatedCompleted = false; 
+    const response = await notes.updateNote(authToken, createdNoteId, updatedTitle, updatedDescription, updatedCategory, updatedCompleted);
+    const errorBody = await response.json();
+    expect(response.status()).toBe(200);
 
 
     const body = await response.json();
@@ -126,4 +128,15 @@ expect(response.status()).toBe(200);
     expect(getResponse.status()).toBe(404);
   });
 
+});
+
+test.describe('API Health Check', () => {
+  test('deve retornar status 200 e mensagem de sucesso para health check', async ({ request }) => {
+    const response = await request.get('https://practice.expandtesting.com/notes/api/healthcheck');
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body.success).toBe(true);
+    expect(body.status).toBe(200);
+    expect(body.message).toBe('Health Check');
+  });
 });

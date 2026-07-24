@@ -1,5 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { AuthRequest } from '../../requests/AuthRequest';
+import { validLoginPayload } from '../../tests/payloads/login/validLoginPayload';
+import { invalidEmailPayload } from '../../tests/payloads/login/invalidEmailPayload';
+import { incorrectPasswordPayload } from '../../tests/payloads/login/incorrectPasswordPayload';
+import { missingEmailPayload } from '../../tests/payloads/login/missingEmailPayload';
+import { missingPasswordPayload } from '../../tests/payloads/login/missingPasswordPayload';
+import { invalidFormatEmailPayload } from '../../tests/payloads/login/invalidFormatEmailPayload';
 
 test.describe('POST /users/login', () => {
 
@@ -11,13 +17,9 @@ test.describe('POST /users/login', () => {
 
   // ── Cenário 1: Login com sucesso ─────────────────────────────────────────
   test('deve retornar 200 e token com credenciais válidas', async () => {
-    const response = await auth.login(
-      process.env.NOTES_EMAIL!,
-      process.env.NOTES_PASSWORD!,
-    );
+    const response = await auth.login(validLoginPayload);
     console.log('URL chamada:', response.url());
     console.log('Status:', response.status());
-    //console.log('Resposta:', await response.text())
 
     expect(response.status()).toBe(200);
 
@@ -41,10 +43,7 @@ test.describe('POST /users/login', () => {
 
   // ── Cenário 2: Email inválido ─────────────────────────────────────────────
   test('deve retornar 401 com email inexistente', async () => {
-    const response = await auth.login(
-      'nao-existe@email.com',
-      process.env.NOTES_PASSWORD!,
-    );
+    const response = await auth.login(invalidEmailPayload);
 
     expect(response.status()).toBe(401);
 
@@ -56,10 +55,7 @@ test.describe('POST /users/login', () => {
 
   // ── Cenário 3: Senha errada ───────────────────────────────────────────────
   test('deve retornar 401 com senha incorreta', async () => {
-    const response = await auth.login(
-      process.env.NOTES_EMAIL!,
-      'SenhaErrada!999',
-    );
+    const response = await auth.login(incorrectPasswordPayload);
 
     expect(response.status()).toBe(401);
 
@@ -70,7 +66,7 @@ test.describe('POST /users/login', () => {
 
   // ── Cenário 4: Email ausente no body ──────────────────────────────────────
   test('deve retornar 400 sem campo email', async () => {
-    const response = await auth.login('', process.env.NOTES_PASSWORD!);
+    const response = await auth.login(missingEmailPayload);
 
     expect(response.status()).toBe(400);
 
@@ -81,7 +77,7 @@ test.describe('POST /users/login', () => {
 
   // ── Cenário 5: Senha ausente no body ─────────────────────────────────────
   test('deve retornar 400 sem campo password', async () => {
-    const response = await auth.login(process.env.NOTES_EMAIL!, '');
+    const response = await auth.login(missingPasswordPayload);
 
     expect(response.status()).toBe(400);
 
@@ -92,7 +88,7 @@ test.describe('POST /users/login', () => {
 
   // ── Cenário 6: Formato de email inválido ──────────────────────────────────
   test('deve retornar 400 com email em formato inválido', async () => {
-    const response = await auth.login('nao-é-um-email', 'qualquersenha');
+    const response = await auth.login(invalidFormatEmailPayload);
 
     expect(response.status()).toBe(400);
 
