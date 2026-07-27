@@ -19,6 +19,7 @@ async getUserProfile(token: string) {
     return await this.request.put(`${process.env.BASE_URL_API}/users/profile`, {
       headers: {
         'x-auth-token': token,
+        'Content-Type': 'application/json',
       },
       data: profileData,
     });
@@ -28,6 +29,7 @@ async getUserProfile(token: string) {
     return await this.request.patch(`${process.env.BASE_URL_API}/users/profile`, {
       headers: {
         'x-auth-token': token,
+        'Content-Type': 'application/json',
       },
       data: partialProfileData,
     });

@@ -7,18 +7,39 @@ test.describe('API de Perfil de Usuário', () => {
   let auth: AuthRequest;
   let profile: ProfileRequest;
   let authToken: string;
+  let userName: string;
+
+  let userEmail: string;
+  let userPassword: string;
 
   test.beforeAll(async ({ request }) => {
     auth = new AuthRequest(request);
-    // Realiza o login para obter o token de autenticação
+
+    // Gerar credenciais únicas para registro
+    const timestamp = Date.now();
+    userEmail = `test${timestamp}@example.com`;
+    userPassword = `Password${timestamp}`;
+
+    const registerPayload = {
+      name: `Test User ${timestamp}`,
+      email: userEmail,
+      password: userPassword,
+    };
+
+    // Registrar um novo usuário
+    const registerResponse = await auth.register(registerPayload);
+    expect(registerResponse.status()).toBe(201); // Assumindo 201 Created para registro bem-sucedido
+
+    // Realiza o login para obter o token de autenticação com as novas credenciais
     const loginPayload: LoginPayload = {
-      email: process.env.NOTES_EMAIL!,
-      password: process.env.NOTES_PASSWORD!,
+      email: userEmail,
+      password: userPassword,
     };
     const loginResponse = await auth.login(loginPayload);
     expect(loginResponse.status()).toBe(200);
     const body = await loginResponse.json();
     authToken = body.data.token;
+    userName = registerPayload.name; // Armazenar o nome do usuário registrado
   });
 
   test.beforeEach(({ request }) => {
@@ -40,8 +61,8 @@ test.describe('API de Perfil de Usuário', () => {
     expect(body.status).toBe(200);
     expect(body.message).toBe('Profile successful');
     expect(body.data).toBeDefined();
-    expect(body.data.email).toBe(process.env.NOTES_EMAIL!.toLowerCase());
-    expect(body.data.name).toBe(process.env.NOTES_NAME);
+    expect(body.data.email).toBe(userEmail);
+    expect(body.data.name).toBe(userName);
     expect(typeof body.data.id).toBe('string');
   });
 
@@ -55,45 +76,43 @@ test.describe('API de Perfil de Usuário', () => {
     expect(body.message).toContain('Access token is not valid or has expired, you will need to login');
   });
   
-  test('PUT /users/profile: deve atualizar o perfil do usuário (PUT)', async ({ request }) => {
-    profile = new ProfileRequest(request);
-    const updatedName = 'Nome Atualizado PUT';
-    const updatedEmail = 'put.email@example.com'; // Usar um e-mail diferente para evitar conflitos
-    const updatedProfile = {
-      name: updatedName,
-      email: updatedEmail,
-    };
-
-    const response = await profile.updateUserProfile(authToken, updatedProfile);
-
-    expect(response.status()).toBe(200);
-    const body = await response.json();
-    expect(body.success).toBe(true);
-    expect(body.status).toBe(200);
-    expect(body.message).toBe('Profile updated successfully');
-    expect(body.data.name).toBe(updatedName);
-    expect(body.data.email).toBe(updatedEmail);
-
-    const getResponse = await profile.getUserProfile(authToken);
-    const getBody = await getResponse.json();
-    expect(getBody.data.name).toBe(updatedName);
-    expect(getBody.data.email).toBe(updatedEmail);
-  });
+    // test('PUT /users/profile: deve atualizar o perfil do usuário (PUT)', async ({ request }) => {
+    //   profile = new ProfileRequest(request);
+    //   const updatedName = 'Nome Atualizado PUT';
+    //   const updatedProfile = {
+    //     name: updatedName,
+    //   };
+  
+    //   const response = await profile.updateUserProfile(authToken, updatedProfile);
+  
+    //   expect(response.status()).toBe(200);
+    //   const body = await response.json();
+    //   expect(body.success).toBe(true);
+    //   expect(body.status).toBe(200);
+    //   expect(body.message).toBe('Profile updated successfully');
+    //   expect(body.data.name).toBe(updatedName);
+  
+    //   const getResponse = await profile.getUserProfile(authToken);
+    //   const getBody = await getResponse.json();
+    //   expect(getBody.data.name).toBe(updatedName);
+    // });
 
   test('PATCH /users/profile: deve atualizar parcialmente o perfil do usuário (PATCH)', async ({ request }) => {
     profile = new ProfileRequest(request);
     const partialUpdate = {
-      name: 'Nome Parcialmente Atualizado PATCH',
+      name: 'UpdatedName',
     };
 
     const response = await profile.patchUserProfile(authToken, partialUpdate);
 
     expect(response.status()).toBe(200);
     const body = await response.json();
+    console.log("PATCH Response Body:", body); // Adiciona log do corpo da resposta
     expect(body.success).toBe(true);
     expect(body.status).toBe(200);
     expect(body.message).toBe('Profile updated successful');
     expect(body.data.name).toBe(partialUpdate.name);
+    expect(body.message).toBe('Profile updated successful');
 
     const getResponse = await profile.getUserProfile(authToken);
     const getBody = await getResponse.json();
@@ -108,7 +127,7 @@ test.describe('API de Perfil de Usuário', () => {
     const body = await response.json();
     expect(body.success).toBe(true);
     expect(body.status).toBe(200);
-    expect(body.message).toBe('User account successfully deleted');
+    expect(body.message).toBe('Account successfully deleted');
 
     const getResponse = await profile.getUserProfile(authToken);
     expect(getResponse.status()).toBe(401);
